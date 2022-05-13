@@ -10,5 +10,6 @@ type Includes<T extends readonly any[], U> = T extends [infer First, ...infer Re
 // 为假，继续判断 Includes<Rest, U> 是否为真（递归）
 // 可以直接
 
-// 这里不知道出了什么毛病，必须导出到 test-cases 中才能识别到
+// BUGFIX 这里必须导出到 test-cases 中才能识别到
+// BUGFIX 因为这个模块里面出现了 import，TS 将其当成了 es-module
 export default Includes
