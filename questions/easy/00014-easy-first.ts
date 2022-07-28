@@ -22,12 +22,17 @@
 
 /* _____________ Your Code Here _____________ */
 
-type First<T extends any[]> = T extends {
-  0: any
-  length: number
-}
-  ? T[0]
-  : never
+// 解法1
+// type First<T extends any[]> = T extends {
+//   0: any
+//   length: number
+// }
+//   ? T[0]
+//   : never
+
+// 解法2
+// infer 是假定这里是第一个元素 TFirst，剩下的都是其他元素（可以为0或多个），这也就保证了至少有一个元素
+type First<TArray extends any[]> = TArray extends [infer TFirst, ...any[]] ? TFirst : never
 
 /* _____________ Test Cases _____________ */
 import type { Equal, Expect } from '@type-challenges/utils'
