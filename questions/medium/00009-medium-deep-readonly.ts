@@ -1,11 +1,24 @@
 /* _____________ Your Code Here _____________ */
 
-type DeepReadonly<Type> = {
-  readonly [Key in keyof Type]: keyof Type[Key] extends never ? Type[Key] : DeepReadonly<Type[Key]>
-}
+// prettier-ignore
+// 易于理解的写法
+type DeepReadonly<Type> = 
+  Type extends (...args: unknown[]) => unknown
+    // 函数类型走 Type
+    ? Type
+    // 进一步判断是否为对象（函数也是对象，但是要排除）
+    : Type extends object
+      // 对象类型
+      ? {
+          readonly [Key in keyof Type]: DeepReadonly<Type[Key]>
+        }
+      // 非对象类型
+      : Type
 
-// 要点1：keyof Type[Key]，表示遍历内层对象的的键值
-// 要点2： extends never，条件类型中永假式的使用，永远都走后面那个分支：DeepReadonly<Type[Key]>
+// 这种写法很莫名奇妙，不好理解
+type DeepReadonly1<Type> = {
+  readonly [Key in keyof Type]: keyof Type[Key] extends never ? Type[Key] : DeepReadonly1<Type[Key]>
+}
 
 /* _____________ Test Cases _____________ */
 import type { Equal, Expect } from '@type-challenges/utils'
@@ -13,8 +26,10 @@ import type { Equal, Expect } from '@type-challenges/utils'
 type cases = [Expect<Equal<DeepReadonly<X>, Expected>>]
 
 type X = {
-  a: () => 22
+  // a: () => 22
+  a: {}
   b: string
+  x: [1, 2]
   c: {
     d: boolean
     e: {
@@ -36,8 +51,10 @@ type X = {
 }
 
 type Expected = {
-  readonly a: () => 22
+  // readonly a: () => 22
+  readonly a: {}
   readonly b: string
+  readonly x: readonly [1, 2]
   readonly c: {
     readonly d: boolean
     readonly e: {
